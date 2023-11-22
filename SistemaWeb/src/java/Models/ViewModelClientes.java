@@ -13,6 +13,7 @@ public class ViewModelClientes {
     private String apellidosCliente;
     private String DUI_Cliente;
     private Date fechaNacCliente;
+    private String telefono;
     private String correo;
     private int ID_Direccion;
     private String direccionCompleta;
@@ -79,6 +80,14 @@ public class ViewModelClientes {
 
     public void setNombresCliente(String nombresCliente) {
         this.nombresCliente = nombresCliente;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
 }

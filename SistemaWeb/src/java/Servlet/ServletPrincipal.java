@@ -424,33 +424,158 @@ public class ServletPrincipal extends HttpServlet {
     }
       
     public void mostrarClientes(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
-            try (Connection conn = DriverManager.getConnection(url)) {
-                request.setAttribute("mensaje_conexion", "Ok!");
-                String sqlQuery = "select * from VistaClientes";
-                PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
-                ResultSet rs = pstmt.executeQuery();
-                ArrayList<ViewModelClientes> listaClientes = new ArrayList<>();
-                while (rs.next()) {
-                    ViewModelClientes cliente = new ViewModelClientes();
-                    cliente.setID_Cliente(rs.getInt("ID_Cliente"));
-                    cliente.setNombresCliente(rs.getString("Nombres"));
-                    cliente.setApellidosCliente(rs.getString("Apellidos"));
-                    cliente.setDUI_Cliente(rs.getString("DUI"));
-                    cliente.setFechaNacCliente(rs.getDate("FechaNac"));
-                    cliente.setCorreo(rs.getString("Email"));
-                    cliente.setID_Direccion(rs.getInt("ID_Direccion"));
-                    cliente.setDireccionCompleta(rs.getString("direccionCompleta"));
-                    listaClientes.add(cliente);
-                }
-                request.setAttribute("listaClientes", listaClientes);
+        try (Connection conn = DriverManager.getConnection(url)) {
+            request.setAttribute("mensaje_conexion", "Ok!");
+            String sqlQuery = "select * from VistaClientes";
+            PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
+            ResultSet rs = pstmt.executeQuery();
+            ArrayList<ViewModelClientes> listaClientes = new ArrayList<>();
+            while (rs.next()) {
+                ViewModelClientes cliente = new ViewModelClientes();
+                cliente.setID_Cliente(rs.getInt("ID_Cliente"));
+                cliente.setNombresCliente(rs.getString("Nombres"));
+                cliente.setApellidosCliente(rs.getString("Apellidos"));
+                cliente.setDUI_Cliente(rs.getString("DUI"));
+                cliente.setFechaNacCliente(rs.getDate("FechaNac"));
+                cliente.setCorreo(rs.getString("Email"));
+                cliente.setTelefono(rs.getString("Telefono"));
+                cliente.setID_Direccion(rs.getInt("ID_Direccion"));
+                cliente.setDireccionCompleta(rs.getString("direccionCompleta"));
+                listaClientes.add(cliente);
             }
-        } catch (SQLException | ClassNotFoundException ex) {
-            request.setAttribute("mensaje_conexion", ex.getMessage());
+            request.setAttribute("listaClientes", listaClientes);
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        request.setAttribute("mensaje_conexion", ex.getMessage());
+        ex.printStackTrace();
+    }
+}
+
+public void agregarCliente(HttpServletRequest request, HttpServletResponse response) {
+    // CAPTURA DE VARIABLES
+    String nombresCliente = request.getParameter("nombresCliente");
+    String apellidosCliente = request.getParameter("apellidosCliente");
+    String DUI_Cliente = request.getParameter("DUI_Cliente");
+    String fechaNacCliente = request.getParameter("fechaNacCliente");
+    String correo = request.getParameter("correo");
+    String telefono = request.getParameter("telefono"); // Agregado el campo de teléfono
+    String ID_Direccion = request.getParameter("ID_Direccion");
+
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        try (Connection conn = DriverManager.getConnection(url)) {
+            conn.setAutoCommit(false); // Deshabilitar la confirmación automática
+
+            String sql = "INSERT INTO Clientes (Nombres, Apellidos, DUI, FechaNac, Email, Telefono, ID_Direccion) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                // Validar que los datos no estén vacíos o nulos
+                if (nombresCliente != null && apellidosCliente != null && DUI_Cliente != null
+                        && fechaNacCliente != null && correo != null && telefono != null && ID_Direccion != null) {
+                    pstmt.setString(1, nombresCliente);
+                    pstmt.setString(2, apellidosCliente);
+                    pstmt.setString(3, DUI_Cliente);
+                    pstmt.setString(4, fechaNacCliente);
+                    pstmt.setString(5, correo);
+                    pstmt.setString(6, telefono);
+                    pstmt.setString(7, ID_Direccion);
+
+                    int registros = pstmt.executeUpdate();
+
+                    if (registros > 0) {
+                        conn.commit(); // Confirmar la transacción si todo está bien
+                        request.getSession().setAttribute("exito", true);
+                    } else {
+                        request.getSession().setAttribute("exito", false);
+                    }
+                } else {
+                    request.getSession().setAttribute("exito", false);
+                }
+            }
+        } catch (SQLException ex) {
+            // Manejar las excepciones de manera más específica
+            request.getSession().setAttribute("exito", false);
             ex.printStackTrace();
         }
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+}
+
+
+
+public void modificarCliente(HttpServletRequest request, HttpServletResponse response) {
+    // CAPTURA DE VARIABLES
+    String ID_Cliente = request.getParameter("ID_Cliente");
+    String nombresCliente = request.getParameter("nombresCliente");
+    String apellidosCliente = request.getParameter("apellidosCliente");
+    String DUI_Cliente = request.getParameter("DUI_Cliente");
+    String fechaNacCliente = request.getParameter("fechaNacCliente");
+    String correo = request.getParameter("correo");
+    String telefono = request.getParameter("telefono"); // Agregado el campo de teléfono
+    String ID_Direccion = request.getParameter("ID_Direccion");
+
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        try (Connection conn = DriverManager.getConnection(url)) {
+            request.setAttribute("mensaje_conexion", "Ok!");
+
+            String sql = "update Clientes set "
+                    + "Nombres=?, "
+                    + "Apellidos=?, "
+                    + "DUI=?, "
+                    + "FechaNac=?, "
+                    + "Email=?, "
+                    + "Telefono=?, " // Agregado el campo de teléfono
+                    + "ID_Direccion=? "
+                    + "where ID_Cliente=?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nombresCliente);
+            pstmt.setString(2, apellidosCliente);
+            pstmt.setString(3, DUI_Cliente);
+            pstmt.setString(4, fechaNacCliente);
+            pstmt.setString(5, correo);
+            pstmt.setString(6, telefono);
+            pstmt.setString(7, ID_Direccion);
+            pstmt.setString(8, ID_Cliente);
+
+            int registros = pstmt.executeUpdate();
+            if (registros > 0) {
+                request.getSession().setAttribute("exito", true);
+            } else {
+                request.getSession().setAttribute("exito", false);
+            }
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        request.getSession().setAttribute("exito", false);
+        ex.printStackTrace();
+    }
+}
+
+
+public void eliminarCliente(HttpServletRequest request, HttpServletResponse response) {
+    String ID_Cliente = request.getParameter("ID_Cliente");
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        try (Connection conn = DriverManager.getConnection(url)) {
+            request.setAttribute("mensaje_conexion", "Ok!");
+            String sql = "delete from Clientes where ID_Cliente=?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, ID_Cliente);
+
+            int registros = pstmt.executeUpdate();
+            if (registros > 0) {
+                request.getSession().setAttribute("exito", true);
+            } else {
+                request.getSession().setAttribute("exito", false);
+            }
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        request.getSession().setAttribute("exito", false);
+        ex.printStackTrace();
+    }
     }
  
 
@@ -510,7 +635,14 @@ public class ServletPrincipal extends HttpServlet {
                 request.getSession().removeAttribute("exito");
             }
             request.getRequestDispatcher("GestionProductos.jsp").forward(request, response);
-        }
+        } else if (accion.equals("RegistroClientes")) {
+            mostrarDirecciones(request, response);
+            if (request.getSession().getAttribute("exito") != null) {
+                request.setAttribute("exito", request.getSession().getAttribute("exito"));
+                request.getSession().removeAttribute("exito");
+            }
+            request.getRequestDispatcher("RegistroClientes.jsp").forward(request, response);
+            }
     }
 
     /**
@@ -579,8 +711,19 @@ public class ServletPrincipal extends HttpServlet {
         } else if (accion.equals("AgregarDireccion")) {
             agregarDireccion(request, response);
             response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=AgregarDireccion");
+        } else if (accion.equals("RegistroCliente")) {
+           
+            agregarCliente(request, response);
+           
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=RegistroClientes");
+        } else if (accion.equals("ModificarCliente")) {
+            modificarCliente(request, response);
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=GestionClientes");
+        } else if (accion.equals("EliminarCliente")) {
+            eliminarCliente(request, response);
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=GestionClientes");
         }
-    }
+        }
     
 
     /**

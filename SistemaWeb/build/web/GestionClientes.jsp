@@ -63,7 +63,7 @@
                     <td><c:out value="${item.DUI_Cliente}" /></td>
                     <td><c:out value="${item.nombresCliente}" /></td>
                     <td><c:out value="${item.apellidosCliente}" /></td>
-                    
+                    <!--<td><c:out value="${item.telefono}" /></td>-->
                     <td><c:out value="${item.fechaNacCliente}" /></td>
                     <!--<td><c:out value="${item.correo}" /></td>-->
                     <td>
@@ -75,6 +75,7 @@
                                                 '${item.apellidosCliente}',
                                                 '${item.DUI_Cliente}',
                                                 '${item.fechaNacCliente}',
+                                                '${item.telefono}',
                                                 '${item.correo}',
                                                 '${item.ID_Direccion}',
                                                 '${item.direccionCompleta}'
@@ -88,6 +89,7 @@
                             <input type="hidden" name="apellidosCliente" value="${item.apellidosCliente}" />
                             <input type="hidden" name="DUI_Cliente" value="${item.DUI_Cliente}" />
                             <input type="hidden" name="fechaNacCliente" value="${item.fechaNacCliente}" />
+                            <input type="hidden" name="telefono" value="${item.telefono}"/>
                             <input type="hidden" name="correo" value="${item.correo}" />
                             <input type="hidden" name="ID_Direccion" value="${item.ID_Direccion}" />
                             <input type="submit" value="Modificar" />
@@ -100,6 +102,7 @@
                             <input type="hidden" name="apellidosCliente" value="${item.apellidosCliente}" />
                             <input type="hidden" name="DUI_Cliente" value="${item.DUI_Cliente}" />
                             <input type="hidden" name="fechaNacCliente" value="${item.fechaNacCliente}" />
+                            <input type="hidden" name="telefono" value="${item.telefono}"/>
                             <input type="hidden" name="correo" value="${item.correo}" />
                             <input type="hidden" name="ID_Direccion" value="${item.ID_Direccion}" />
                             <input type="submit" value="Eliminar" />
@@ -118,6 +121,7 @@
         <label>Apellidos: <span id="apellidosCliente"></span></label><br>
         <label>DUI: <span id="DUI_Cliente"></span></label><br>
         <label>Fecha de Nacimiento: <span id="fechaNacCliente"></span></label><br>
+        <label>Telefono: <span id="telefono"></span></label><br>
         <label>Email: <span id="correo"></span></label><br>
         <!-- Se ha eliminado la línea para mostrar ID_Direccion en el pop-up -->
         <label>Dirección Completa: <span id="direccionCompleta"></span></label><br><br>
@@ -138,12 +142,13 @@
             }
         }
 
-        function mostrarDetallesCliente(ID_Cliente, nombresCliente, apellidosCliente, DUI_Cliente, fechaNacCliente, correo, ID_Direccion, direccionCompleta) {
+        function mostrarDetallesCliente(ID_Cliente, nombresCliente, apellidosCliente, DUI_Cliente, fechaNacCliente,telefono, correo, ID_Direccion, direccionCompleta) {
             document.getElementById('ID_Cliente').textContent = ID_Cliente;
             document.getElementById('nombresCliente').textContent = nombresCliente;
             document.getElementById('apellidosCliente').textContent = apellidosCliente;
             document.getElementById('DUI_Cliente').textContent = DUI_Cliente;
             document.getElementById('fechaNacCliente').textContent = fechaNacCliente;
+            document.getElementById('telefono').textContent = telefono;
             document.getElementById('correo').textContent = correo;
             // Se ha eliminado la línea para mostrar ID_Direccion en el pop-up
             document.getElementById('direccionCompleta').textContent = direccionCompleta;

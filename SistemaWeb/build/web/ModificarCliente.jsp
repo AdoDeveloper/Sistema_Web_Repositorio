@@ -20,6 +20,8 @@
             <input type="text" name="DUI_Cliente" id="DUI_Cliente" value="${param.DUI_Cliente}" required /><br>
             <label>Fecha de nacimiento:</label>
             <input type="date" name="fechaNacCliente" id="fechaNacCliente" value="${param.fechaNacCliente}" required /><br>
+            <label>Telefono:</label>
+            <input type="text" name="telefono" id="telefono" value="${param.telefono}" required /><br>
             <label>Email:</label>
             <input type="email" name="correo" id="correo" value="${param.correo}" required /><br>
             <!-- Utiliza el combobox para seleccionar la dirección -->
