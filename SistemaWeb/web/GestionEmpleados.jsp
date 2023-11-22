@@ -41,7 +41,7 @@
     <body>
         <h1>Gestión de Empleados</h1>
         <h2>Listado de Empleados</h2>
-        <h3>Conexion: ${mensaje_conexion}</h3><br>
+        <!--<h3>Conexion: ${mensaje_conexion}</h3><br>-->
 
         <a href="/SistemaWeb?accion=RegistroEmpleados">Agregar empleado</a><br><br>
 

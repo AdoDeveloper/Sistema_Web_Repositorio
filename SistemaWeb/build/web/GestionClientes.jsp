@@ -36,22 +36,23 @@
         </style>
 </head>
 <body>
-    <h3>Conexion: ${mensaje_conexion}</h3><br>
+    <!--<h3>Conexion: ${mensaje_conexion}</h3><br>-->
     <h1>Gestión de Clientes</h1>
-
+    <h2>Listado de Clientes</h2>
     <!-- Agrega el código para mostrar la lista de clientes -->
     <%-- Agrega esta línea para imprimir el tamaño de la listaClientes --%>
-    <p>Tamaño de la listaClientes: ${fn:length(listaClientes)}</p>
+    <!--<p>Tamaño de la listaClientes: ${fn:length(listaClientes)}</p>-->
+    <a href="/SistemaWeb?accion=RegistroClientes">Agregar cliente</a><br><br>
 
     <table border="1">
         <thead>
             <tr>
                 <th>ID Cliente</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
                 <th>DUI</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>             
                 <th>Fecha Nacimiento</th>
-                <th>Email</th>
+                <!--<th>Email</th>-->
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -59,11 +60,12 @@
             <c:forEach items="${listaClientes}" var="item">
                 <tr>
                     <td><c:out value="${item.ID_Cliente}" /></td>
+                    <td><c:out value="${item.DUI_Cliente}" /></td>
                     <td><c:out value="${item.nombresCliente}" /></td>
                     <td><c:out value="${item.apellidosCliente}" /></td>
-                    <td><c:out value="${item.DUI_Cliente}" /></td>
+                    
                     <td><c:out value="${item.fechaNacCliente}" /></td>
-                    <td><c:out value="${item.correo}" /></td>
+                    <!--<td><c:out value="${item.correo}" /></td>-->
                     <td>
                         <!-- Ver detalles -->
                         <button class="open-popup-btn" 
