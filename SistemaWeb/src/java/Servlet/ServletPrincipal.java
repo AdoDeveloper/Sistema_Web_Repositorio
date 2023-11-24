@@ -248,6 +248,53 @@ public class ServletPrincipal extends HttpServlet {
             ex.printStackTrace();
         }
     }
+public void modificarProducto(HttpServletRequest request, HttpServletResponse response) {
+    String ID_Producto = request.getParameter("ID_Producto");
+    String Nombre_Producto = request.getParameter("Nombre_Producto");
+    String descripcion = request.getParameter("Descripcion");
+    String Precio_Unitario = request.getParameter("Precio_Unitario");
+    String Existencia = request.getParameter("Existencia");
+    String ID_Proveedor = request.getParameter("ID_Proveedor");
+    String Nombre_Proveedor = request.getParameter("Nombre_Proveedor");
+    String Telefono_Proveedor = request.getParameter("Telefono_Proveedor");
+
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        try (Connection conn = DriverManager.getConnection(url)) {
+            String sql = "update VistaDetalleProductos set "
+                + "Nombre_Producto=?, "
+                + "Descripcion=?, "
+                + "Precio_Unitario=?, "
+                + "Existencia=?, "
+                + "ID_Proveedor=?, "
+                + "Nombre_Proveedor=?, "
+                + "Telefono_Proveedor=? "
+                + "where ID_Producto=?";
+            
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, Nombre_Producto);
+                pstmt.setString(2, descripcion);
+                pstmt.setString(3, Precio_Unitario);
+                pstmt.setString(4, Existencia);
+                pstmt.setString(5, ID_Proveedor);
+                pstmt.setString(6, Nombre_Proveedor);
+                pstmt.setString(7, Telefono_Proveedor);
+                pstmt.setString(8, ID_Producto);
+                
+                int registros = pstmt.executeUpdate();
+                if (registros > 0) {
+                    request.getSession().setAttribute("exito", true);
+                } else {
+                    request.getSession().setAttribute("exito", false);
+                }
+            }
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        request.getSession().setAttribute("exito", false);
+        ex.printStackTrace(); // Podrías manejar la excepción de una manera más amigable.
+    }
+}
+
 
     //Funciones de eliminacion de registros (DELETE)
     public void eliminarEmpleado(HttpServletRequest request, HttpServletResponse response) {
@@ -257,6 +304,27 @@ public class ServletPrincipal extends HttpServlet {
             try (Connection conn = DriverManager.getConnection(url)) {
                 request.setAttribute("mensaje_conexion", "Ok!");
                 String sql = "delete from Empleados where ID_Empleado='" + ID_Empleado + "'";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                int registros = pstmt.executeUpdate();
+                if (registros > 0) {
+                    request.getSession().setAttribute("exito", true);
+                } else {
+                    request.getSession().setAttribute("exito", false);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            request.getSession().setAttribute("exito", false);
+            ex.printStackTrace();
+        }
+    }
+    
+        public void eliminarProducto(HttpServletRequest request, HttpServletResponse response) {
+        String ID_Producto = request.getParameter("ID_Producto");
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            try (Connection conn = DriverManager.getConnection(url)) {
+                request.setAttribute("mensaje_conexion", "Ok!");
+                String sql = "delete from Productos where ID_Producto='" + ID_Producto + "'";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 int registros = pstmt.executeUpdate();
                 if (registros > 0) {

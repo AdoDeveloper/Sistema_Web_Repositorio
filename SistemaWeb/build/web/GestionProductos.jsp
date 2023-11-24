@@ -32,12 +32,11 @@
                 z-index: 0;
             }
         </style>
-  
     </head>
     <body>
         <h1>Gestión de Productos</h1>
         <h2>Listado de Productos</h2>
-        <h3>Conexion: ${mensaje_conexion}</h3><br>
+        <!--<h3>Conexion: ${mensaje_conexion}</h3><br>-->
 
         <table border="1">
             <thead>
@@ -65,37 +64,92 @@
                         <td><c:out value="${item.ID_Proveedor}" /></td>
                         <td><c:out value="${item.nombreProveedor}" /></td>
                         <td><c:out value="${item.telefonoProveedor}" /></td>
+                        <td>
+                            <!-- Ver detalles -->
+                            <button class="open-popup-btn" 
+                                    onclick="mostrarDetallesProductos(
+                                                '${item.ID_Producto}',
+                                                '${item.nombreProducto}',
+                                                '${item.descripcion}',
+                                                '${item.precioUnitario}',
+                                                '${item.existencia}',
+                                                '${item.ID_Proveedor}',
+                                                '${item.nombreProveedor}',
+                                                '${item.telefonoProveedor}'
+                                                )">Ver detalles
+                            </button>
+                            <!-- Contenedor del pop-up -->
+                            <div class="overlay" id="overlay"></div>
+                            <div class="popup-container" id="popup">
+                                <label>ID Producto: <span id="ID_Producto"></span></label><br>
+                                <label>Nombre Producto: <span id="nombreProducto"></span></label><br>
+                                <label>Descripcion: <span id="descripcion"></span></label><br>
+                                <label>Precio Unitario: <span id="precioUnitario"></span></label><br>
+                                <label>Existencia: <span id="existencia"></span></label><br>
+                                <label>ID Proveedor: <span id="ID_Proveedor"></span></label><br>
+                                <label>Nombre Proveedor: <span id="nombreProveedor"></span></label><br>
+                                <label>Telefono Proveedor: <span id="telefonoProveedor"></span></label><br>
+                                <button onclick="abrirPopup()">Cerrar</button>
+                            </div>
+
+                            <!-- Modificar -->
+                            <form method="POST" action="/SistemaWeb/ModificarProducto.jsp">
+                                <input type="hidden" name="ID_Producto" value="${item.ID_Producto}" />
+                                <input type="hidden" name="nombreProducto" value="${item.nombreProducto}" />
+                                <input type="hidden" name="descripcion" value="${item.descripcion}" />
+                                <input type="hidden" name="precioUnitario" value="${item.precioUnitario}" />
+                                <input type="hidden" name="existencia" value="${item.existencia}" />
+                                <input type="hidden" name="ID_Proveedor" value="${item.ID_Proveedor}" />
+                                <input type="hidden" name="nombreProveedor" value="${item.nombreProveedor}" />
+                                <input type="hidden" name="telefonoProveedor" value="${item.telefonoProveedor}" />
+                                <input type="submit" value="Modificar" />
+                            </form>
+
+                            <!-- Eliminar -->
+                            <form method="POST" action="/SistemaWeb/EliminarProducto.jsp">
+                                <input type="hidden" name="ID_Producto" value="${item.ID_Producto}" />
+                                <input type="hidden" name="nombreProducto" value="${item.nombreProducto}" />
+                                <input type="hidden" name="descripcion" value="${item.descripcion}" />
+                                <input type="hidden" name="precioUnitario" value="${item.precioUnitario}" />
+                                <input type="hidden" name="existencia" value="${item.existencia}" />
+                                <input type="hidden" name="ID_Proveedor" value="${item.ID_Proveedor}" />
+                                <input type="hidden" name="nombreProveedor" value="${item.nombreProveedor}" />
+                                <input type="hidden" name="telefonoProveedor" value="${item.telefonoProveedor}" />
+                                <input type="submit" value="Eliminar" />
+                            </form>
+
+                        </td>
                     </tr>
                 </c:forEach>
             </tbody>            
         </table>
     </body>
-          <script>
-    function abrirPopup() {
-        var popup = document.getElementById('popup');
-        var overlay = document.getElementById('overlay');
+    <script>
+        function abrirPopup() {
+            var popup = document.getElementById('popup');
+            var overlay = document.getElementById('overlay');
 
-        if (popup.style.display === 'block') {
-            popup.style.display = 'none';
-            overlay.style.display = 'none';
-        } else {
-            popup.style.display = 'block';
-            overlay.style.display = 'block';
+            if (popup.style.display === 'block') {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+            } else {
+                popup.style.display = 'block';
+                overlay.style.display = 'block';
+            }
         }
-    }
 
-    function mostrarDetallesProductos(ID_Producto, Nombre_Producto, Descripcion, Precio_Unitario, Existencia, ID_Proveedor, Nombre_Proveedor, Telefono_Proveedor) {
-        document.getElementById('ID_Producto').textContent = ID_Producto;
-        document.getElementById('Nombre_Producto').textContent = Nombre_Producto;
-        document.getElementById('Descripcion').textContent = Descripcion;
-        document.getElementById('Precio_Unitario').textContent = Precio_Unitario;
-        document.getElementById('Existencia').textContent = Existencia;
-        document.getElementById('ID_Proveedor').textContent = ID_Proveedor;
-        document.getElementById('Nombre_Proveedor').textContent = Nombre_Proveedor;
-        document.getElementById('Telefono_Proveedor').textContent = Telefono_Proveedor;
+        function mostrarDetallesProductos(ID_Producto, Nombre_Producto, Descripcion, Precio_Unitario, Existencia, ID_Proveedor, Nombre_Proveedor, Telefono_Proveedor) {
+            document.getElementById('ID_Producto').textContent = ID_Producto;
+            document.getElementById('nombreProducto').textContent = Nombre_Producto;
+            document.getElementById('descripcion').textContent = Descripcion;
+            document.getElementById('precioUnitario').textContent = Precio_Unitario;
+            document.getElementById('existencia').textContent = Existencia;
+            document.getElementById('ID_Proveedor').textContent = ID_Proveedor;
+            document.getElementById('nombreProveedor').textContent = Nombre_Proveedor;
+            document.getElementById('telefonoProveedor').textContent = Telefono_Proveedor;
 
-        // Muestra el pop-up
-        abrirPopup();
-    }
-</script>
+            // Muestra el pop-up
+            abrirPopup();
+        }
+    </script>
 </html>
