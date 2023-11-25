@@ -16,6 +16,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import Models.ViewModelEmpleados;
+import Models.ViewModelFacturas;
+import Models.ViewModelVentas;
+import jakarta.servlet.RequestDispatcher;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -645,7 +648,127 @@ public void eliminarCliente(HttpServletRequest request, HttpServletResponse resp
         ex.printStackTrace();
     }
     }
- 
+
+
+
+     public void mostrarVentas(HttpServletRequest request, HttpServletResponse response) {
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        try (Connection conn = DriverManager.getConnection(url)) {
+            request.setAttribute("mensaje_conexion", "Ok!");
+
+            String sqlQuery = "SELECT * FROM VistaDetalleVentas";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
+                 ResultSet rs = pstmt.executeQuery()) {
+
+                ArrayList<ViewModelVentas> listaVentas = new ArrayList<>();
+                while (rs.next()) {
+                    ViewModelVentas venta = new ViewModelVentas();
+                    venta.setID_Venta(rs.getInt("ID_Venta"));
+                    venta.setFechaVenta(rs.getDate("FechaVenta"));
+                    venta.setSubtotal(rs.getDouble("SubTotal"));
+                    venta.setTotal(rs.getDouble("Total"));
+                    venta.setNombreProducto(rs.getString("Nombre_Producto"));
+                    venta.setPrecioUnitario(rs.getDouble("Precio_Unitario"));
+                    venta.setCantidadProducto(rs.getInt("Cantidad_Producto"));
+                    venta.setNombreCliente(rs.getString("Cliente"));
+                    listaVentas.add(venta);
+                }
+
+                request.setAttribute("listaVentas", listaVentas);
+                }
+            }
+            } catch (SQLException | ClassNotFoundException ex) {
+                request.setAttribute("mensaje_conexion", ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+     
+public void mostrarFacturas(HttpServletRequest request, HttpServletResponse response) {
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        try (Connection conn = DriverManager.getConnection(url)) {
+            request.setAttribute("mensaje_conexion", "Ok!");
+
+            String sqlQuery = "SELECT * FROM VistaDetalleFacturas";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
+                 ResultSet rs = pstmt.executeQuery()) {
+
+                ArrayList<ViewModelFacturas> listaFacturas = new ArrayList<>();
+                while (rs.next()) {
+                    ViewModelFacturas factura = new ViewModelFacturas();
+                    factura.setID_Cliente(rs.getInt("ID_Cliente"));
+                    factura.setNombres(rs.getString("Nombres"));
+                    factura.setApellidos(rs.getString("Apellidos"));
+                    factura.setDui(rs.getString("DUI"));
+                    factura.setFechaNac(rs.getDate("FechaNac"));
+                    factura.setEmail(rs.getString("Email"));
+                    factura.setId_factura(rs.getInt("ID_Factura"));
+                    factura.setIva(rs.getDouble("IVA"));
+                    factura.setDescuento(rs.getDouble("Descuento"));
+                    factura.setSubTotal(rs.getDouble("SubTotal"));
+                    factura.setTotal(rs.getDouble("Total"));
+                    factura.setNit(rs.getString("NIT"));
+                    factura.setId_venta(rs.getInt("ID_Venta"));
+                    factura.setMontoVenta(rs.getDouble("MontoVenta"));
+                    factura.setFechaVenta(rs.getDate("FechaVenta"));
+                    factura.setNombreProducto(rs.getString("Nombre_Producto"));
+                    factura.setPrecioUnitario(rs.getDouble("Precio_Unitario"));
+                    factura.setCantidadProducto(rs.getInt("Cantidad_Producto"));
+                    listaFacturas.add(factura);
+                }
+
+                request.setAttribute("listaFacturas", listaFacturas);
+                
+            }
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        request.setAttribute("mensaje_conexion", ex.getMessage());
+        ex.printStackTrace();
+    }
+}
+
+public ViewModelFacturas obtenerDetallesFacturaPorVenta(int idVenta) {
+    ViewModelFacturas detallesFactura = new ViewModelFacturas();
+
+    try (Connection conn = DriverManager.getConnection(url)) {
+        String sqlQuery = "SELECT * FROM VistaDetalleFacturas WHERE ID_Venta = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sqlQuery)) {
+            pstmt.setInt(1, idVenta);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    detallesFactura.setID_Cliente(rs.getInt("ID_Cliente"));
+                    detallesFactura.setNombres(rs.getString("Nombres"));
+                    detallesFactura.setApellidos(rs.getString("Apellidos"));
+                    detallesFactura.setDui(rs.getString("DUI"));
+                    detallesFactura.setFechaNac(rs.getDate("FechaNac"));
+                    detallesFactura.setEmail(rs.getString("Email"));
+                    detallesFactura.setId_factura(rs.getInt("ID_Factura"));
+                    detallesFactura.setIva(rs.getDouble("IVA"));
+                    detallesFactura.setDescuento(rs.getDouble("Descuento"));
+                    detallesFactura.setSubTotal(rs.getDouble("SubTotal"));
+                    detallesFactura.setTotal(rs.getDouble("Total"));
+                    detallesFactura.setNit(rs.getString("NIT"));
+                    detallesFactura.setId_venta(rs.getInt("ID_Venta"));
+                    detallesFactura.setMontoVenta(rs.getDouble("MontoVenta"));
+                    detallesFactura.setFechaVenta(rs.getDate("FechaVenta"));
+                    detallesFactura.setNombreProducto(rs.getString("Nombre_Producto"));
+                    detallesFactura.setPrecioUnitario(rs.getDouble("Precio_Unitario"));
+                    detallesFactura.setCantidadProducto(rs.getInt("Cantidad_Producto"));
+                }
+            }
+        }
+    } catch (SQLException ex) {
+        // Manejo de excepciones
+        ex.printStackTrace();
+    }
+
+    return detallesFactura;
+}
+
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -666,17 +789,22 @@ public void eliminarCliente(HttpServletRequest request, HttpServletResponse resp
             request.getRequestDispatcher("Login.jsp").forward(request, response);
         } else if (accion.equals("Login")) {
             request.getRequestDispatcher("Login.jsp").forward(request, response);
-        }else if (accion.equals("GestionEmpleados")) {
+        } else if (accion.equals("GestionEmpleados")) {
             mostrarEmpleados(request, response);
             request.getRequestDispatcher("GestionEmpleados.jsp").forward(request, response);
         } else if (accion.equals("RegistroProductos")) {
             request.getRequestDispatcher("RegistroProductos.jsp").forward(request, response);
-        } else if (accion.equals("Ventas")) {
-            request.getRequestDispatcher("Ventas.jsp").forward(request, response);
+        } else if (accion.equals("GestionVentas")) {
+            mostrarVentas(request, response);
+            mostrarFacturas(request, response);
+        
+            request.getRequestDispatcher("GestionVentas.jsp").forward(request, response);
         } else if (accion.equals("Clientes")) {
             request.getRequestDispatcher("Clientes.jsp").forward(request, response);
         } else if (accion.equals("GestionClientes")) {
             mostrarClientes(request, response);
+            mostrarDirecciones(request, response);
+            
             request.getRequestDispatcher("GestionClientes.jsp").forward(request, response);
         } else if (accion.equals("PedidosProductos")) {
             request.getRequestDispatcher("PedidosProductos.jsp").forward(request, response);
@@ -710,7 +838,19 @@ public void eliminarCliente(HttpServletRequest request, HttpServletResponse resp
                 request.getSession().removeAttribute("exito");
             }
             request.getRequestDispatcher("RegistroClientes.jsp").forward(request, response);
-            }
+        } else if (accion.equals("verFactura")) {
+        // Obtener el ID_Venta desde los parámetros de la URL
+        int idVenta = Integer.parseInt(request.getParameter("ID_Venta"));
+        ViewModelFacturas detallesFactura = obtenerDetallesFacturaPorVenta(idVenta);
+
+        // Puedes realizar alguna acción con los detallesFactura
+        request.setAttribute("detallesFactura", detallesFactura);
+
+        // Redirigir a la página JSP
+       request.getRequestDispatcher("GestionFacturas.jsp").forward(request, response);
+        //mostrarEmpleados(request, response);
+         //request.getRequestDispatcher("GestionEmpleados.jsp").forward(request, response);
+    }
     }
 
     /**

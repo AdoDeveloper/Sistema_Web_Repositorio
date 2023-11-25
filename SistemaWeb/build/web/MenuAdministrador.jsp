@@ -130,9 +130,9 @@
                 </a>
             </li>
             <li>
-                <a class="btn-gray" href="/SistemaWeb?accion=Ventas">
+                <a class="btn-gray" href="/SistemaWeb?accion=GestionVentas">
                     <i class="fas fa-dollar-sign"></i>
-                    <span class="btn-text">Ventas</span>
+                    <span class="btn-text">Gestion Ventas</span>
                 </a>
             </li>
             <li>
