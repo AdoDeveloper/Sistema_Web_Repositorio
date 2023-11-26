@@ -36,8 +36,8 @@
 </head>
 <body>
     <h1>Gestión de Ventas</h1>
-    <h2>Listado de Ventas</h2>
-    
+    <h2>Listado de Ventas</h2><br>
+    <a href="/SistemaWeb?accion=RegistroVentas">Agregar venta</a><br><br>
     <table border="1">
         <thead>
             <tr>

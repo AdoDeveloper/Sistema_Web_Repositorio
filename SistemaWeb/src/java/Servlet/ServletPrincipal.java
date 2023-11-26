@@ -24,8 +24,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.beans.Statement;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServletPrincipal extends HttpServlet {
 
@@ -666,7 +673,7 @@ public void eliminarCliente(HttpServletRequest request, HttpServletResponse resp
                 while (rs.next()) {
                     ViewModelVentas venta = new ViewModelVentas();
                     venta.setID_Venta(rs.getInt("ID_Venta"));
-                    venta.setFechaVenta(rs.getDate("FechaVenta"));
+                    venta.setFechaVenta(rs.getString("FechaVenta"));
                     venta.setSubtotal(rs.getDouble("SubTotal"));
                     venta.setTotal(rs.getDouble("Total"));
                     venta.setNombreProducto(rs.getString("Nombre_Producto"));
@@ -713,7 +720,7 @@ public void mostrarFacturas(HttpServletRequest request, HttpServletResponse resp
                     factura.setNit(rs.getString("NIT"));
                     factura.setId_venta(rs.getInt("ID_Venta"));
                     factura.setMontoVenta(rs.getDouble("MontoVenta"));
-                    factura.setFechaVenta(rs.getDate("FechaVenta"));
+                    factura.setFechaVenta(rs.getString("FechaVenta"));
                     factura.setNombreProducto(rs.getString("Nombre_Producto"));
                     factura.setPrecioUnitario(rs.getDouble("Precio_Unitario"));
                     factura.setCantidadProducto(rs.getInt("Cantidad_Producto"));
@@ -754,7 +761,7 @@ public ViewModelFacturas obtenerDetallesFacturaPorVenta(int idVenta) {
                     detallesFactura.setNit(rs.getString("NIT"));
                     detallesFactura.setId_venta(rs.getInt("ID_Venta"));
                     detallesFactura.setMontoVenta(rs.getDouble("MontoVenta"));
-                    detallesFactura.setFechaVenta(rs.getDate("FechaVenta"));
+                    detallesFactura.setFechaVenta(rs.getString("FechaVenta"));
                     detallesFactura.setNombreProducto(rs.getString("Nombre_Producto"));
                     detallesFactura.setPrecioUnitario(rs.getDouble("Precio_Unitario"));
                     detallesFactura.setCantidadProducto(rs.getInt("Cantidad_Producto"));
@@ -768,6 +775,114 @@ public ViewModelFacturas obtenerDetallesFacturaPorVenta(int idVenta) {
 
     return detallesFactura;
 }
+
+    public void agregarVenta(HttpServletRequest request, HttpServletResponse response) {
+    // Obtener datos del formulario
+    String fechaVenta = request.getParameter("fechaVenta");
+    String montoVenta = request.getParameter("total");
+
+    int cantidadProducto = Integer.parseInt(request.getParameter("cantidadProducto"));
+    int idProducto = Integer.parseInt(request.getParameter("idProducto"));
+
+    int idCliente = Integer.parseInt(request.getParameter("idCliente"));
+
+    Connection conn = null;
+    PreparedStatement pstmtVentas = null;
+    PreparedStatement pstmtDetalleVentas = null;
+    PreparedStatement pstmtFacturas = null;
+
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+        conn = DriverManager.getConnection(url);
+        conn.setAutoCommit(false); // Deshabilitar el modo de autocommit
+
+        // Insertar en la tabla Ventas
+        String sql = "INSERT INTO Ventas (FechaVenta, MontoVenta) VALUES (?, ?)";
+        pstmtVentas = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        pstmtVentas.setString(1, fechaVenta);
+        pstmtVentas.setString(2, montoVenta);
+        pstmtVentas.executeUpdate();
+
+        System.out.print("se insertó en venta");
+
+        // Obtener el ID_Venta generado
+        try (ResultSet generatedKeys = pstmtVentas.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                int idVenta = generatedKeys.getInt(1);
+
+                // Insertar en la tabla Detalle_Ventas
+                String insertDetalleVentas = "INSERT INTO Detalle_Ventas (Cantidad_Producto, ID_Producto, ID_Venta) VALUES (?, ?, ?)";
+                pstmtDetalleVentas = conn.prepareStatement(insertDetalleVentas);
+                pstmtDetalleVentas.setInt(1, cantidadProducto);
+                pstmtDetalleVentas.setInt(2, idProducto);
+                pstmtDetalleVentas.setInt(3, idVenta);
+                pstmtDetalleVentas.executeUpdate();
+
+                System.out.print("se insertó en detalle venta");
+
+                // Insertar en la tabla Facturas
+                String insertFacturas = "INSERT INTO Facturas (IVA, Descuento, SubTotal, Total, NIT, ID_Cliente, ID_Venta) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                pstmtFacturas = conn.prepareStatement(insertFacturas);
+
+                String iva = request.getParameter("iva");
+                String descuento = request.getParameter("descuento");
+                String subTotal = request.getParameter("subtotal");
+                String total = request.getParameter("total");
+                String nit = request.getParameter("nit");
+
+                pstmtFacturas.setString(1, iva);
+                pstmtFacturas.setString(2, descuento);
+                pstmtFacturas.setString(3, subTotal);
+                pstmtFacturas.setString(4, total);
+                pstmtFacturas.setString(5, nit);
+                pstmtFacturas.setInt(6, idCliente);
+                pstmtFacturas.setInt(7, idVenta);
+
+                int registros = pstmtFacturas.executeUpdate();
+
+                if (registros > 0) {
+                    conn.commit(); // Confirmar la transacción si todo está bien
+                    request.getSession().setAttribute("exito", true);
+                } else {
+                    request.getSession().setAttribute("exito", false);
+                }
+
+                System.out.print("se insertó en factura");
+            }
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        try {
+            if (conn != null) {
+                conn.rollback(); // Hacer rollback en caso de error
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        // Manejar errores y redirigir o mostrar mensajes al usuario según sea necesario
+    } finally {
+        try {
+            if (pstmtVentas != null) {
+                pstmtVentas.close();
+            }
+            if (pstmtDetalleVentas != null) {
+                pstmtDetalleVentas.close();
+            }
+            if (pstmtFacturas != null) {
+                pstmtFacturas.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -839,18 +954,26 @@ public ViewModelFacturas obtenerDetallesFacturaPorVenta(int idVenta) {
             }
             request.getRequestDispatcher("RegistroClientes.jsp").forward(request, response);
         } else if (accion.equals("verFactura")) {
-        // Obtener el ID_Venta desde los parámetros de la URL
-        int idVenta = Integer.parseInt(request.getParameter("ID_Venta"));
-        ViewModelFacturas detallesFactura = obtenerDetallesFacturaPorVenta(idVenta);
+            // Obtener el ID_Venta desde los parámetros de la URL
+            int idVenta = Integer.parseInt(request.getParameter("ID_Venta"));
+            ViewModelFacturas detallesFactura = obtenerDetallesFacturaPorVenta(idVenta);
 
-        // Puedes realizar alguna acción con los detallesFactura
-        request.setAttribute("detallesFactura", detallesFactura);
+            // Puedes realizar alguna acción con los detallesFactura
+            request.setAttribute("detallesFactura", detallesFactura);
 
-        // Redirigir a la página JSP
-       request.getRequestDispatcher("GestionFacturas.jsp").forward(request, response);
-        //mostrarEmpleados(request, response);
-         //request.getRequestDispatcher("GestionEmpleados.jsp").forward(request, response);
-    }
+            // Redirigir a la página JSP
+            request.getRequestDispatcher("GestionFacturas.jsp").forward(request, response);
+            //mostrarEmpleados(request, response);
+            //request.getRequestDispatcher("GestionEmpleados.jsp").forward(request, response);
+         } else if(accion.equals("RegistroVentas")){
+            mostrarProductos(request, response);
+            mostrarClientes(request, response);
+            if (request.getSession().getAttribute("exito") != null) {
+                request.setAttribute("exito", request.getSession().getAttribute("exito"));
+                request.getSession().removeAttribute("exito");
+            }
+            request.getRequestDispatcher("RegistroVentas.jsp").forward(request, response);
+         } 
     }
 
     /**
@@ -930,8 +1053,13 @@ public ViewModelFacturas obtenerDetallesFacturaPorVenta(int idVenta) {
         } else if (accion.equals("EliminarCliente")) {
             eliminarCliente(request, response);
             response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=GestionClientes");
+        } else if (accion.equals("RegistroVenta")) {
+           
+            agregarVenta(request, response);
+            System.out.print("pasa al llamado");
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=RegistroVentas");
         }
-        }
+    }
     
 
     /**

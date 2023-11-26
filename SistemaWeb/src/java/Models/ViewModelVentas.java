@@ -9,7 +9,7 @@ import java.util.Date;
 public class ViewModelVentas {
 
     private int ID_Venta;  
-    private Date fechaVenta;
+    private String fechaVenta;
     private Double subtotal;
     private Double total;
     private String nombreProducto;
@@ -74,11 +74,11 @@ public class ViewModelVentas {
         this.ID_Venta = ID_Venta;
     }
 
-    public Date getFechaVenta() {
+    public String getFechaVenta() {
         return fechaVenta;
     }
 
-    public void setFechaVenta(Date fechaVenta) {
+    public void setFechaVenta(String fechaVenta) {
         this.fechaVenta = fechaVenta;
-    }   
+    }
 }

@@ -26,7 +26,7 @@ public class ViewModelFacturas {
     private String nit;
     private int id_venta;
     private double montoVenta;
-    private Date fechaVenta;
+    private String fechaVenta;
     private String nombreProducto;
     private double precioUnitario;
     private int cantidadProducto;
@@ -143,11 +143,11 @@ public class ViewModelFacturas {
         this.montoVenta = montoVenta;
     }
 
-    public Date getFechaVenta() {
+    public String getFechaVenta() {
         return fechaVenta;
     }
 
-    public void setFechaVenta(Date fechaVenta) {
+    public void setFechaVenta(String fechaVenta) {
         this.fechaVenta = fechaVenta;
     }
 
