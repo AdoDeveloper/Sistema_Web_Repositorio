@@ -136,7 +136,7 @@
                 </a>
             </li>
             <li>
-                <a class="btn-yellow" href="/SistemaWeb?accion=PedidosProductos">
+                <a class="btn-yellow" href="/SistemaWeb?accion=GestionPedidos">
                     <i class="fas fa-truck"></i>
                     <span class="btn-text">Pedidos</span>
                 </a>
